@@ -8,11 +8,14 @@
 import SwiftUI
 import MapKit
 
-var landmarks: [Landmark] = load("landmarkData.json")
-
 struct PracticeScreen: View {
     
+    @EnvironmentObject var landmarkObservableObject: LandmarkObservableObject
     var landmark: Landmark
+    
+    var currentIndex: Int {
+        return landmarkObservableObject.landmarks.firstIndex(where: { $0.id == landmark.id }) ?? 0
+    }
     
     var body: some View {
         ScrollView {
@@ -25,8 +28,11 @@ struct PracticeScreen: View {
                 .padding(.bottom, -130)
             
             VStack(alignment: .leading) {
-                Text(landmark.name)
-                    .font(.title)
+                HStack {
+                    Text(landmark.name)
+                        .font(.title)
+                    FavoriteButton(isFav: $landmarkObservableObject.landmarks[currentIndex].isFavorite)
+                }
                 
                 HStack {
                     Text(landmark.park)
@@ -46,12 +52,6 @@ struct PracticeScreen: View {
         }
         .navigationTitle(landmark.name)
         .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-struct PracticeScreen_Previews: PreviewProvider {
-    static var previews: some View {
-        PracticeScreen(landmark: landmarks[1])
     }
 }
 
@@ -75,7 +75,6 @@ struct MapView: View {
 }
 
 struct CustomizedCircularImage: View {
-    
     let image: Image
     
     var body: some View {
@@ -88,24 +87,15 @@ struct CustomizedCircularImage: View {
     }
 }
 
-func load<T: Decodable>(_ filename: String) -> T {
-    let data: Data
+struct FavoriteButton: View {
+    @Binding var isFav: Bool
     
-    guard let file = Bundle.main.url(forResource: filename, withExtension: nil)
-    else {
-        fatalError("Couldn't find \(filename) in main bundle.")
-    }
-    
-    do {
-        data = try Data(contentsOf: file)
-    } catch {
-        fatalError("Couldn't load \(filename) from main bundle:\n\(error)")
-    }
-    
-    do {
-        let decoder = JSONDecoder()
-        return try decoder.decode(T.self, from: data)
-    } catch {
-        fatalError("Couldn't parse \(filename) as \(T.self):\n\(error)")
+    var body: some View {
+        Button {
+            isFav.toggle()
+        } label: {
+            Image(systemName: isFav ? "star.fill" : "star")
+                .foregroundColor(isFav ? .yellow : .gray)
+        }
     }
 }

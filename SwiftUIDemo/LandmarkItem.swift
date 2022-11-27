@@ -18,12 +18,11 @@ struct LandmarkItem: View {
             Text(landmark.name)
             
             Spacer()
+            
+            Image(systemName: landmark.isFavorite ? "star.fill" : "star")
+                .resizable()
+                .frame(width: 20, height: 20)
+                .foregroundColor(landmark.isFavorite ? .yellow : .gray)
         }
-    }
-}
-
-struct LandmarkItem_Previews: PreviewProvider {
-    static var previews: some View {
-        LandmarkItem(landmark: landmarks[1])
     }
 }

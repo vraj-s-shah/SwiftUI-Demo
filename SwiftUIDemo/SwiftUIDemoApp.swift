@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct SwiftUIDemoApp: App {
+    @StateObject private var landmarkObservableObject = LandmarkObservableObject()
+    
     var body: some Scene {
         WindowGroup {
             LandmarkList()
+                .environmentObject(landmarkObservableObject)
         }
     }
 }
